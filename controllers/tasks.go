@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"verbatestapp/entities"
@@ -74,7 +75,13 @@ func GetTaskById(w http.ResponseWriter, r *http.Request) { // Обработчи
 		return
 	}
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	path := strings.TrimPrefix(r.URL.Path, "/tasks/")
+	if path == "" || strings.Contains(path, "/") {
+		http.Error(w, "Неверный формат id!", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(path)
 	if err != nil || id < 1 {
 		http.Error(w, "Неверный формат id!", http.StatusBadRequest)
 		return
@@ -100,7 +107,13 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) { // Обработчи�
 		return
 	}
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	path := strings.TrimPrefix(r.URL.Path, "/tasks/")
+	if path == "" || strings.Contains(path, "/") {
+		http.Error(w, "Неверный формат id!", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(path)
 	if err != nil || id < 1 {
 		http.Error(w, "Неверный формат id!", http.StatusBadRequest)
 		return
@@ -142,13 +155,19 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) { // Обработчи�
 		return
 	}
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	path := strings.TrimPrefix(r.URL.Path, "/tasks/")
+	if path == "" || strings.Contains(path, "/") {
+		http.Error(w, "Неверный формат id!", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(path)
 	if err != nil || id < 1 {
 		http.Error(w, "Неверный формат id!", http.StatusBadRequest)
 		return
 	}
 
-	if err := models.DeleteTask(id); err != nil && err.Error() == fmt.Sprintf("No task with provided id: %d", id) {
+	if err := models.DeleteTask(id); err != nil && err.Error() == fmt.Sprintf("no task with provided id: %d", id) {
 		http.Error(w, "Задача не найдена!", http.StatusNotFound)
 		return
 	} else if err != nil {
