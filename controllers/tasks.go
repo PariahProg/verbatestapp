@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"verbatestapp/entities"
 	"verbatestapp/models"
@@ -25,11 +26,16 @@ func CreateTask(w http.ResponseWriter, r *http.Request) { // Обработчи�
 
 	var task entities.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		http.Error(w, "Неправильный формат данных!", http.StatusUnprocessableEntity)
+		http.Error(w, "Неправильный формат данных!", http.StatusBadRequest)
 		return
 	}
 
 	if task.Title == "" || task.Description == "" || task.DueDate == "" {
+		http.Error(w, "Неправильный формат данных!", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := time.Parse(time.RFC3339, task.DueDate); err != nil {
 		http.Error(w, "Неправильный формат данных!", http.StatusBadRequest)
 		return
 	}
@@ -102,11 +108,16 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) { // Обработчи�
 
 	var task entities.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		http.Error(w, "Неправильный формат данных!", http.StatusUnprocessableEntity)
+		http.Error(w, "Неправильный формат данных!", http.StatusBadRequest)
 		return
 	}
 
 	if task.Title == "" || task.Description == "" || task.DueDate == "" {
+		http.Error(w, "Неправильный формат данных!", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := time.Parse(time.RFC3339, task.DueDate); err != nil {
 		http.Error(w, "Неправильный формат данных!", http.StatusBadRequest)
 		return
 	}
